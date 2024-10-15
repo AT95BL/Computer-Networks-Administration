@@ -1,0 +1,814 @@
+MAC = Media Access Control
+ARP = Adress Resolution Protocol
+OSI = Open Systems Interconnection
+DHCP = Dynamic Host Configuration Protocol
+TCP = Transmission Control Protocol
+UDP = User Datagram Protocol
+
+RUTERI
+---- SERIJSKI LINK NEMA MAC ADRESA(Eth se ne koristi na serijskim linkovima)
+Limited broadcast Adresa ima vrednost 255.255.255.255. Ova adresa se koristi kako bi se poslala poruka svim uređajima unutar iste mreže. Ne ide van mreze
+
+MAC TABELA SWITCHA
+--------------------------------------------------------------------------------------------------------------------------------------------
+Kada switch (svic) prima frejm, SVIC JE NA L2
+
+Learning (Učenje): https://www.youtube.com/watch?v=cah-hNfWzJs&t=3s
+Ako izvorna MAC adresa u frejmu već postoji u MAC tabeli switcha, switch ažurira vreme poslednjeg viđenja te adrese u tabeli.
+Ako izvorna MAC adresa nije prisutna u tabeli, switch je "uči" dodajući je u tabelu zajedno sa informacijom o portu na kojem je primio frejm.
+Filtriranje i prosljedjivanje:
+Ako se nalazi u tabeli samo njoj prosljedjuje frejm, ako ne onda svima u mrezi osim porta koji je poslao
+
+
+
+
+----------------------------------------------------------------------------------------------------------------
+Slanje poruke hosta prema serveru:
+L2(MAC adrese) SRC MAC(host) DEST MAC(gateway)
+L3(IP adrese) SRC IP(host) DEST IP(Server)       
+
+Uspostavljanje veze izmedju hosta i DNS servera:
+Min velicina Eth frejma:14(zaglavlje) + 4(trailer) + 20(IP zaglavlje) + 20(TCP zaglavlje) + (padding - 6) = 64[B]
+Max je 14+4 +60+60 = 138[B](nema korisnih podataka)
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+Evo kako funkcioniše ARP zahtev i ARP odgovor: https://www.youtube.com/watch?v=cn8Zxh9bPio&t=182s
+
+Kada uređaj želi poslati podatke drugom uređaju u istoj lokalnoj mreži, ali zna samo IP adresu tog uređaja, koristi ARP za rešavanje odgovarajuće MAC adrese.
+
+ARP Zahtev (ARP Request):
+Ukoliko uređaj želi pronaći MAC adresu određene IP adrese, šalje ARP zahtev u obliku ARP poruke širom lokalne mreže.
+ARP zahtev uključuje IP adresu uređaja za koji uređaj traži odgovarajuću MAC adresu.
+Sve uređaje u mreži primača, uključujući i samog primaoca ARP zahteva, proveravaju da li je IP adresa iz ARP zahteva njihova.
+Samo uređaj sa odgovarajućom IP adresom odgovara na ARP zahtev.
+
+ARP Odgovor (ARP Reply):
+Ukoliko je IP adresa iz ARP zahteva ista kao IP adresa uređaja koji je primio ARP zahtev, taj uređaj šalje ARP odgovor.
+ARP odgovor sadrži traženu MAC adresu.
+Uređaj koji je prvobitno poslao ARP zahtev prima ARP odgovor i ažurira svoj ARP keš sa dobivenom MAC adresom.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+DHCP
+https://www.youtube.com/watch?v=e6-TaH5bkjo
+
+DHCP Discover:
+U ovoj fazi, DHCP klijent (npr. uređaj koji se povezuje na mrežu) šalje DHCP Discover poruku u potrazi za DHCP serverima.
+DHCP Discover poruka se šalje putem broadcast-a na lokalnu mrežu.
+Broadcast adresa (255.255.255.255) ili adresa mrežnog segmenta (npr. 192.168.1.255) koristi se kako bi se osiguralo da poruka stigne 
+do svih uređaja na lokalnom segment
+Cilj je pronaći dostupne DHCP servere.
+
+DHCP Offer:
+DHCP serveri koji primete DHCP Discover poruku odgovaraju DHCP Offer porukama.
+DHCP Offer poruke sadrže informacije o dostupnim IP adresama i drugim konfiguracionim parametrima koje DHCP klijent može prihvatiti.
+Klijent može primiti više DHCP Offer poruka od različitih servera.
+
+DHCP Request:
+Na osnovu primljenih DHCP Offer poruka, DHCP klijent bira jedan DHCP server i šalje DHCP Request poruku tom serveru.
+Ova poruka formalno zahteva odabranu IP adresu.
+
+DHCP Acknowledgment:
+DHCP server koji je primio DHCP Request poruku potvrđuje zahtev DHCP Acknowledgment porukom.
+Ova poruka sadrži konačne informacije o dodeljenoj IP adresi i drugim konfiguracionim parametrima.
+Kada DHCP klijent primi DHCP Acknowledgment, konfiguriše svoj mrežni interfejs sa dobijenom IP adresom i završava inicijalizaciju.
+
+
+
+ENKAPSULACIJA-objedinjavanje kontrolnih i korisnih info na svakom sloju protokol steka
+PDU-rezultat enkapsulacije na nekom sloju
+SKRIVANJE PODATAKA-proces u kojem su osjetljivi podaci sakriveni, i oni su dostupni samo korisniku koji je pokusao da im zametne trag
+------------------------------------------------------------------------------------------------
+VAZNOOOOO
+Koliko polja u zaglavljima TCP segmenta, UDP datagrama, IP paketa i Ethernet frejma ruter mijenja
+prilikom prosljedjivanja toka podataka kojeg primi?
+
+Ethernet frejm - sva polja
+IP zaglavlje - mijenja TTL i Header Checksum
+TCP/UDP zaglavlje - ne mijenja nista, jer su na transportnom sloju, a ruter je na mreznom
+Međutim, ako ruter vrši Network Address Translation (NAT), što je često slučaj, onda će promeniti 
+izvornu i odredišnu IP adresu u zaglavlju i, u nekim slučajevima, i portove u polju TCP/UDP zaglavlja.
+
+TTL ako ima ff onda nije prosao ni kroz jedan ruter. Jer se pri svakom prolazu on smanjuje za 1. (fe prosao kroz jedan)
+
+Kako je postavljeno polje Protocol u IP zaglavlju? Objasniti.--samo oni na 3.sloju imaju(ARP Eth nema) 
+
+Da li polje Payload Length u IPv6 zaglavlju ima isto znacenje kao polje Packet Length u IPv4 zaglavlju?
+Ponovljeno, NEMA, Packet length predstavlja veličinu čitavog paketa, a Payload length veličinu paketa bez zaglavlja.
+
+TUNELOVANJE u Ethernet frejmu znači da se jedan mrežni paket (često s originalnim Ethernet zaglavljem) umetne unutar drugog Ethernet frejma. 
+Ovo se obično radi kako bi se omogućila komunikacija između dvaju mrežnih segmenata koji inače ne bi bili u mogućnosti direktno komunicirati
+
+PORT 21 FTP prenos
+
+koja opcija se moze ukljuciti na svicu i ruteru tako da se automatski prilagode bbilo kom kablu
+Auto -MDIX
+
+CRC(Cyclic Redundancy Check) 
+Izracunaj CRC pri slanju paketa od hostaA ka hostuC
+
+hostA-SW(Store-and-forward)-R1-R2-R3-SW(Cut through)-hostC
+  1   +     1               +2 +2 +2 + 0            + 1 = 9
+
+STORE AND FORWARD =1
+CUT THROUGH = 0 (ima korist sto je DEST MAC prije SRC MAC u frejmu(bilo pitanje))
+Router=2
+host=1
+--------------------------------------------------
+                             hub             switch          ruter
+izolacija saobracaja	            		x	        x                                                
+plug and play                     		x
+brzo prosljedjivanje				x		x
+
+
+Izolacija saobraćaja:
+Hub: Ne obezbeđuje izolaciju saobraćaja. Hub prosleđuje sve podatke svim uređajima na mreži.
+Switch: Pruža izolaciju saobraćaja na Layer 2. Svaki port na switchu čini zaseban segment mreže, pa se saobraćaj ograničava na određeni port.
+Router: Pruža izolaciju saobraćaja na Layer 3. Ruter razdvaja mreže i omogućava da saobraćaj bude prosleđen samo ka određenoj destinaciji.
+
+Plug and Play:
+Hub: Ne podržava "plug and play" funkcionalnost jer ne može automatski prepoznati i konfigurisati uređaje koji se priključe.
+Switch: Podržava "plug and play" jer može automatski prepoznati uređaje koji se priključe na bilo koji od njegovih portova.
+Router: "Plug and play" nije uobičajena karakteristika rutera na isti način kao kod switcha, ali neki moderni ruteri mogu automatski konfigurisati određene postavke.
+
+Brzo prosljeđivanje:
+Hub: Ne pruža brzo prosljeđivanje. Hub jednostavno šalje podatke na sve portove.
+Switch: Pruža brzo prosljeđivanje. Switch efikasno usmerava podatke na određeni port bazirano na MAC adresi primaoca.
+Router: Pruža brzo prosljeđivanje na nivou Layer 3. Ruter usmerava podatke na osnovu IP adresa i optimalnih ruta.
+--------------------------------------------------
+DHCP ne moze da koristi TCP protokol jer:
+DHCP koristi broadcast poruke, ne moze TCP protokol jer on radi sa unicast adresama
+odnosno mora da se uspostavi veza izmedju tacno 2 uredjaja. Dok DHCP salje broadcast tj. svima u mrezi. 
+
+
+
+
+
+TCP UDP PORT
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Primeri nekoliko dobro poznatih TCP portova:
+Port 80: HTTP (Hypertext Transfer Protocol)
+Port 443: HTTPS (Hypertext Transfer Protocol Secure)
+Port 21: FTP (File Transfer Protocol)
+Port 25: SMTP (Simple Mail Transfer Protocol)
+Port 22: SSH (Secure Shell)
+Port 23: Telnet
+
+Port 53: DNS (Domain Name System)
+Port 67/68: DHCP (Dynamic Host Configuration Protocol)
+Port 69: TFTP (Trivial File Transfer Protocol)
+Port 123: NTP (Network Time Protocol)
+Port 161/162: SNMP (Simple Network Management Protocol)
+
+(**Protokol (protocol)** i **port** su ključni pojmovi u mrežnoj komunikaciji, koji omogućavaju prenos podataka između uređaja.
+
+### **Protokol (protocol)**:
+Protokol je set pravila koji definiše kako će se podaci prenositi između dva uređaja na mreži. On određuje kako se podaci formiraju, šalju, primaju i obrađuju. Postoje različiti protokoli za različite tipove komunikacije.
+
+- **TCP (Transmission Control Protocol)**: Obezbeđuje pouzdanu komunikaciju, tako što uspostavlja vezu pre prenosa podataka, potvrđuje prijem paketa, i brine o ponovnom slanju u slučaju grešaka.
+  
+- **UDP (User Datagram Protocol)**: Omogućava brži prenos podataka bez uspostavljanja veze i bez garancije isporuke, što znači da podaci mogu biti izgubljeni ili primljeni van reda, ali je zato manji overhead.
+
+### **Port**:
+Port je brojčana oznaka koja identifikuje specifičnu aplikaciju ili uslugu na jednom računaru. Portovi omogućavaju istovremeni prenos podataka različitim aplikacijama na istom uređaju. Na primer, jedan server može istovremeno da pruža različite usluge kao što su web (HTTP) i e-mail (SMTP), a različiti portovi služe za razlikovanje tih usluga.
+
+- **Port 80 (TCP)**: Koristi se za HTTP, web stranice bez enkripcije.
+- **Port 443 (TCP)**: Koristi se za HTTPS, web stranice sa enkripcijom.
+- **Port 53 (TCP/UDP)**: DNS, koji služi za prevođenje domena u IP adrese.
+
+### Primer upotrebe:
+Kada upišeš URL u pretraživač, koristiš **HTTP** ili **HTTPS** protokol. Web server sluša na **portu 80** (za HTTP) ili **portu 443** (za HTTPS), čime omogućava da ti isporuči odgovarajuće podatke preko mreže.
+
+### Ukratko:
+- **Protokol** definiše pravila komunikacije.
+- **Port** identifikuje specifičnu aplikaciju ili uslugu na računaru koji koristi te protokole.)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+FRAMGENTACIJA
+-ako je fragment offset>0 ili ako je on 0 a MF flag>0 onda se desila fragmentacija, 
+u ipv4 flag prvi je 0, drugi je df(Don't Fragment), treci je mf(More Fragments)
+
+
+POVEZANOST INTERFACE ID I IPv6
+--------
+Ipv6 adrese obično se sastoje od dvaju dijelova: mrežnog dijela i identifikatora sučelja (interface ID). 
+Identifikator sučelja (interface ID) često se dobiva iz MAC adrese mrežnog sučelja uređaja.
+
+IPv6 adresa sastoji se od 128 bitova, a MAC adresa obično ima 48 bitova. Kako bi se dobila puna IPv6 adresa, 
+MAC adresa se proširuje i dodaju se dodatni bitovi. Uobičajeno je dodavanje 16 bitova vrijednosti "FFFE" između drugog i 
+trećeg bajta MAC adrese. Na primjer, ako imate MAC adresu 00:1A:2B:3C:4D:5E, možete dobiti identifikator sučelja (interface ID) 
+za IPv6 tako da dodate "FFFE" i proširite MAC adresu: 001A:2BFF:FE3C:4D5E.
+
+Original: 2041:0000:140F:0000:0000:0000:875B:131B
+Short: 2041:0000:140F::875B:131B
+If there is a string of zeros then you can remove them once. In the example above I removed the entire 0000:0000:0000 part. 
+You can only do this once, here is more however, the address can be shortened even more:
+
+Short: 2041:0000:140F::875B:131B
+Shorter: 2041:0:140F::875B:131B
+If you have a “hextet” with 4 zeros then you can remove those and leave a single zero
+
+Leading zeros can also be removed, here’s another address to demonstrate this:
+
+Original: 2001:0001:0002:0003:0004:0005:0006:0007
+Short: 2001:1:2:3:4:5:6:7
+--------
+
+OUI--- PRVA TRI BAJTA Ethernet adrese i koristi se za identifikaciju proizvođača mrežne opreme.
+Packet Length polje obično sadrži ukupnu dužinu Ethernet frejma, uključujući zaglavlje i podatke. 
+Packet Length se obično izračunava kao dužina IP paketa plus 14 bajtova (dužina Ethernet zaglavlja bez preambule, Start of Frame delimiter i Frame Check Sequence polja).
+Imamo 74 bajta, 14 bajtova + 60. 60 pretvorimo u hexa i tjt, ako je IPv4
+
+TCP ZAGLAVLJE(20B)
+------------------------------------------------------------------------------------------------
+-src port i dest port(socket-i)
+-Sequence number (Sekvencijski broj) u TCP zaglavlju označava redni broj prvog bajta podataka u segmentu. 
+Taj broj služi za numeriranje bajtova podataka koji se prenose između pošiljatelja i primatelja tijekom TCP veze
+Primjerice, ako pošiljatelj šalje podatke veličine 500 bajtova, a prvi bajt ima sekvencijski broj 1000, to znači da su podaci numerirani od 1000 do 1499. 
+Primatelj će koristiti sekvencijski broj kako bi ispravno rasporedio podatke i shvatio redoslijed u kojem su poslani.
+-Acknowledge Number - koliko je bajtova host primio dosad. Ova vrijednost predstavlja sljedeći očekivani broj bajtova koji će host primiti.
+-Header Length ili Offset (Pomak) označava duzinu TCP zaglavlja izraženu u riječima 4 bita
+-Reserved 3 bita
+
+ Unutar TCP zaglavlja postoji osam jednobitnih polja koja sadrže kontrolne informacije koje se koriste za upravljanje TCP procesima. 
+FLEGOVI(6 bita)
+ URG – označava segmente koji se odmah procesiraju (urgent)
+ ACK – potvrda uspješnog primanja segmenta
+ PSH – “guranje” podataka aplikacionom sloju
+ RST – resetovanje konekcije
+ SYN – sinhronizacija, pri uspostavljanju veze
+ FIN – označava da nema više podataka za slanje, pri zatvaranju veze
+--chatgpt objasnjeni ACk i syn, fin i ack..
+
+
+-Window -veličina prozora određuje koliko podataka primatelj može primiti prije nego što zatraži potvrdu (ACK) od pošiljatelja.
+-checksum koristi se za otkrivanje grešaka ili promjena u podacima tokom prijenosa.
+-urgent pointer označava hitnu ili važnu poruku
+------------------------------------------------------------------------------------------------
+---kontrolne info, postotak i korisni info---
+---------
+Izračunavanje postotka kontrolnih informacija u paketu obično se vrši tako da se podijeli ukupna veličina kontrolnih informacija (iz zaglavlja)
+s ukupnom veličinom paketa (zaglavlje + podaci) i pomnoži s 100 kako bi se dobilo postotak. 
+
+Razlika između korisnih (payload) informacija i kontrolnih informacija je u svrsi i funkciji tih informacija:
+
+Korisne informacije (Payload): To su stvarni podaci koje šaljete ili primate. Na primjer, to mogu biti tekstualni dokumenti, slike, zvuk, 
+ili bilo koji drugi oblik informacija koji ima smisla za primatelja.
+Kontrolne informacije: To su informacije koje se koriste za upravljanje i kontrolu same komunikacije. Primjerice, zaglavlja protokola (npr., TCP, IP)
+sadrže kontrolne informacije poput adresa, brojeva sekvenci, veličine prozora i checksum-a koje su bitne za ispravnu isporuku podataka.
+------------------
+
+
+
+Interface ID čini posljednjih 64 bita IPv6 adrese, izvodi se iz fizičke adrese mreznog interfejsa
+----------
+Dobivanje MAC adrese: Uzimanje 48-bitne MAC adrese mrežnog sučelja uređaja.
+Dodavanje FFFE: Dodavanje bajtova "FFFE" između trećeg i četvrtog bajta MAC adrese.
+Invertiranje bita: Invertiranje 7. bita u proširenom EUI-64 dijelu.
+
+Primjer generisanja EUI-64 Interface ID-a iz MAC adrese:
+Ako je MAC adresa: 00:12:34:56:78:9A
+
+Dodavanje FFFE: 00:12:34:FF:FE:56:78:9A
+Invertiranje bita: 02:12:34:FF:FE:56:78:9A
+Dakle, Interface ID je 0212:34FF:FE56:789A.
+----------
+
+traceroute poruka
+-------------------------
+Standardna veličina poruke koju traceroute koristi obično je 40 bajta. 
+Ova veličina uključuje 20 bajta za IP zaglavlje i 8 bajta za ICMP zaglavlje, 
+ICMP nema identifikatore procesa
+Standardna veličina traceroute poruke za UDP je 28 bajtova, ICMP Echo Request(ping) je 64 bajta
+ Sta ce host sa datom odredianom IP adresom odgovoriti na ovaj paket kada ga primi?
+-Ovo je Echo Request poruka jer je polje Type u ICMP headeru postavljeno na 08, TTL je 1, a hostovi nisu na isotj mreži (različit početak IP adresa). 
+ukoliko postoji na putanji još rutera, odredišni host neće ni primiti paket, a ako ne postoji, onda će na njega odgovoriti sa Echo Reply porukom. (?)
+
+-------------------------
+
+IPv4
+-----------------------------------------------------------------------------------------------------------------------------
+IPv4 zaglavlje ima fiksnu veličinu od 20 bajtova (160 bitova). Ovo je standardna veličina za IPv4 pakete i uključuje različite informacije potrebne za rutiranje i
+isporuku podataka na odredište. Slijede polja koja čine IPv4 zaglavlje:
+
+Version(Verzijan): 4 bita - Označava verziju IP protokola (IPv4).
+IHL(Duzina zaglavlja): 4 bita - Označava duljinu zaglavlja u riječima od 32 bita.dući da je minimalna duljina 20 bajtova, ovo polje će imati vrijednost 5.
+Differentiated Services Code Point (DSCP): 6 bita - Kvaliteta usluge, određuje prioritet paketa.
+Explicit Congestion Notification (ECN): 2 bita - Koristi se za upravljanje zagušenjima u mreži.
+Total Length (Ukupna duzina): 16 bita - Ukupna veličina paketa (zaglavlje + podaci).
+Identification (Identifikacija): 16 bita - Jedinstveni identifikator paketa.
+Flags (Flegovi): 3 bita - Različite zastave koje se koriste za upravljanje fragmentacijom.
+Fragment Offset: 13 bita - Pomak fragmenta u odnosu na početak paketa.
+Time to Live (TTL): 8 bita - Broj ruterskih skokova (hop count) koji paket može proći prije nego što bude odbačen.
+Protocol: 8 bita - Označava vrstu transportnog protokola (npr. TCP, UDP).
+Header Checksum: 16 bita - Provjera greške zaglavlja.
+Izvor (Source) i Odredište (Destination) IP adrese: Po 32 bita - IP adrese izvora i odredišta.
+-----------------------------------------------------------------------------------------------------------------------------
+ 
+IPv6
+-----------------------------------------------------------------------------------------------------------------------------
+IPv6 zaglavlje ima fiksnu veličinu od 40 bajtova (320 bitova).
+IPv6 zaglavlje uključuje sljedeće polja:
+
+Verzija (Version): 4 bita - Označava verziju IP protokola (IPv6).
+Priority: 4 bita - Zamjena za DSCP u IPv4, koristi se za označavanje prioriteta prometa.
+Flow Label: 24 bita - Koristi se za označavanje paketa koji pripadaju određenom toku.
+Payload Length (Duljina polja): 16 bita - Označava veličinu podataka, uključujući proširenja, koja slijedi nakon zaglavlja.
+Next Header: 8 bita - Označava vrstu sljedećeg zaglavlja (slično "Protocol" polju u IPv4 zaglavlju).
+Hop Limit: 8 bita - Analogno "Time to Live" polju u IPv4, označava maksimalan broj ruterskih skokova koje paket smije prijeći.
+Izvor (Source) i Odredište (Destination) IP adrese: Po 128 bitova - IP adrese izvora i odredišta.
+-----------------------------------------------------------------------------------------------------------------------------
+
+ICMP
+-----------------------------------------------------------------------------------------------------------------------------
+Type (8 bita): Označava vrstu ICMP poruke, na primjer, Echo Request, Echo Reply, Destination Unreachable, Time Exceeded itd.
+Type Code     Description
+0 		Echo reply.
+3 		Destination unreachable.
+3     0 	Net unreachable.
+3     1 	Host unreachable.
+3     2 	Protocol unreachable.
+3     3 	Port unreachable.
+5 	     	Redirect.
+5     0 	Redirect datagrams for the network.
+5     1		Redirect datagrams for the host.
+5     2		Redirect datagrams for the type of service and network.
+5     3		Redirect datagrams for the type of service and host.
+8 		Echo. (request)
+11 		Time exceeded.
+11    0		Time to live exceeded in transit.
+135   0		Neighbor Solicitation
+136   0		Neighbor advertisement
+
+
+
+Code (8 bita): Ovisno o vrsti ICMP poruke, koristi se za pružanje dodatnih informacija o tipu poruke.
+Checksum (16 bita): Koristi se za detekciju pogrešaka u ICMP paketu.
+Rest (32 bita): Ovisno o vrsti ICMP poruke, može sadržavati dodatne podatke, uključujući IP zaglavlje originalnog paketa
+ (najčešće kod poruka poput Destination Unreachable i Time Exceeded).
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+ARP reply
+-----------------------------------------------------------------------------------------------------------------------------
+ARP zaglavlje je protokol na mrežnom sloju (sloj 3) koji se koristi za mapiranje IP adresa na fizičke (MAC) adrese u lokalnoj mreži.
+ Evo strukture ARP zaglavlja:
+
+Hardware Type (Tip hardvera) označava tip fizičkog sloja (npr. Ethernet, Frame Relay).
+Protocol Type (Tip protokola) označava tip protokola sloja 3 (npr. IPv4).
+HLen(Duzina hardverske adrese) označava duzinu hardverske adrese (npr. duzina MAC adrese u bajtovima).
+PLen(Duzina protokolne adrese) označava duzinu protokolne adrese (npr. duzinu IPv4 adrese u bajtovima).
+Operation (Operacija) označava vrstu ARP operacije: zahtjev (Request) ili odgovor (Reply).
+Sender Hardware Address (Hardverska adresa pošiljatelja) duzina promjenjiva, ovisno o duzini hardverske adrese.(MAC)
+Sender Protocol Address (Protokolna adresa pošiljatelja) duzina promjenjiva, ovisno o duzini protokolne adrese.(IPv4, 6)
+Target Hardware Address (Hardverska adresa odredišta) adresa odredišta (MAC adresa) - u ARP Reply, ovo će biti adresa zahtjevača.
+Target Protocol Address (Protokolna adresa odredišta) adresa odredišta (npr. IPv4 adresa) - u ARP Reply, ovo će biti adresa zahtjevača.
+
+Struktura ARP zaglavlja omogućuje uređajima u lokalnoj mreži da pronađu fizičku adresu (MAC adresu) povezanu s određenom IP adresom. 
+ 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+3.Fizicki sloj
+------------------------------------------------------------------------------------------------
+Brzina prenosa podataka se mjeri na 3 načina:
+- Bandwidth – mjeri količinu informacija koja može doći od jednog mjesta na drugo za zadano vrijeme (idealna situacija)
+- Throughput – slična definicija kao za bandwidth, ali za realne situacije; pri mjerenju se uzimaju u obzir faktori kao što su količina i 
+tip saobraćaja i broj uređaja priključenih na mrežu
+- Goodput – mjeri količinu KORISNIH informacija
+
+
+UTP kablovi(3) --18slajd
+Terminacija UTP kablova --19slajd
+Wirelles protokoli-CSMA/CA pominje se na roku 34 slajd
+------------------------------------------------------------------------------------------------
+
+4-sloj veze ppodataka(data link)
+------------------------------------------------------------------------------------------------
+Media Access Control = regulisanje smještanja frame-ova na medijum 
+Dvije osnovne metode:
+1. Controlled – svaki čvor ima definisano vrijeme kada šalje(deterministička metoda)
+2. Contention-based – svi čvorovi konkurišu za medijum (nederministička metoda); kolizija - CSMA/CD, CSMA/CA
+
+ Point-to-point link, kanal nema između koga da se dijeli
+ Dvije opcije:
+- full duplex – oba uređaja istovremeno šalju i primaju
+- half duplex – uređaji mogu da šalju i primaju, ali ne istovremeno
+------------------------------------------------------------------------------------------------
+
+5.Ethernet stp-prica o kablovima, Hub, Switch, ARP, CSMA
+------------------------------------------------------------------------------------------------
+Veličina frejma: 64 – 1518 bajtova (bez preambule i SFD), odbacuje se ako nije u tim granicama
+
+Multicast (1 -> grupa)
+ 01-00-5E + 23 niža bita IP multicast adrese (25. bit je 0)
+
+CSMA/CD
+ Carrier Sense – osluškivanje kanala, ako je zauzet čeka, akoje slobodan šalje
+ Multiple Access – u slušaju da uređaj ne primjeti da je kanal zauzet (kašnjenje signala) i pošalje svoju poruku,
+dolazi do miješanja signala i uništavanja poruka
+ Collision Detection – kad se kolizija desi svi uređaji koji osluškuju kanal će primjetiti porast u amplitudi signala
+ Jam signal – kad uređaji koji šalju primjete da je došlo do kolizije, 
+šalju jam signal koji obavještava druge uređaje na kanalu da je došlo do kolizije;
+ Random backoff – algoritam koji se aktivira kada uređaj primi jam signal; 
+uređaj prekida pokušaje slanja na random period; nakon toga se vraća u mod slušanja prije slanja
+------------------------------------------------------------------------------------------------
+
+6.mrezni sloj, rutiranje
+------------------------------------------------------------------------------------------------
+Protokoli mrežnog sloja
+ IPv4, IPv6, Novell, AppleTalk, CLNS/DECNet
+ IPv4 – jedini protokol za prenos podataka preko Interneta
+ IPv6 – protokol budućnost
+------------------------------------------------------------------------------------------------
+
+8.transportni sloj, portovi-soket, TCP-UDP
+------------------------------------------------------------------------------------------------
+3 way handschake 17/32
+
+------------------------------------------------------------------------------------------------
+
+9.APLIKACIONI SLOJ
+------------------------------------------------------------------------------------------------
+u DNS kesu se nalazi ip adresa uredjaja kojeg je DNS klijent trazio
+
+Prije nego što se obrati drugim DNS serverima, DNS server
+provjerava da li se podaci o traženom hostu nalaze u njegovom DNS kešu,
+ Ako DNS server nema podatke o traženom hostu u svom DNS
+kešu, onda mora da se obrati drugim DNS serverima.
+
+PROTOKOLI, DHCP 
+
+
+RUTIRANJE
+
+ruter radi na prva 3 sloja
+Dinamicki protokoli
+ RIP = Routing Information Protocol
+ OSPF = Open Shortest Path First
+
+Metrika
+ Vrijednost (drugi broj u uglastoj zagradi) koju ruteri koriste da odluče koja je od više mogućih putanja naučenih od istog izvora
+povoljnija za rutiranje
+ RIP koristi hop count za računanje metrike, a OSPF bandwidth.
+ Load balancing – raspoređivanje paketa na jednako vrijedne putanje
+
+Administrativna distanca
+ Vrijednost (prvi broj u uglastoj zagradi) koju ruteri koriste da odluče koja je od više mogućih putanja naučenih od
+različitih izvora povoljnija za rutiranje
+ Manja distanca => ruta povoljnija!
+ Neke distance:
+direktno povezana mreža = 0
+statička ruta = 1
+protokol OSPF = 110
+protokol RIP = 120
+
+ARP - kesiranje
+------------
+Kada čvor primi frame, upiše source IP i MAC adresu
+- Ako mu treba neka MAC adresa za poznatu IP adresu,
+šalje broadcast ARP request svima u mreži i očekuje ARP
+reply
+ unosi se brišu ako se neaktivni određeno vrijeme (slično kao kod MAC tabela)
+
+
+ako su 2 hosta povezana na switch a on na ruter. I ako host1 zeli saznati mac hosta2, na kraju komunikacije ARP kes
+Hosta1 će sadržavati mapiranje IP adrese Hosta2 na MAC adresu nakon završetka komunikacije, ali neće nužno imati 
+informacije o IP adresi rutera, jer routanje obično zahteva ARP za resoluciju adresa na sloju 3.
+
+Kada host A prvi put pokušava komunicirati sa uređajem na mreži, kao što je povezivanje na udaljeni server putem telnet-a, 
+njegov ARP keš će biti ažuriran kako bi sadržao mapiranje između IP adrese tog udaljenog uređaja i njegove MAC adrese. 
+Ovo mapiranje se dodaje u ARP keš tokom procesa rešavanja adresa.
+
+Ako se u lokalnoj mrezi nalazi DNS dobice ip i mac adresu gateway-a rutera i dns servera.
+A ako dns srv ne postoji dobice samo adrese rutera 
+
+-------
+
+
+ECHO REPLY I ECHO REQUEST
+----------------------------
+Ping (ICMP Echo Request):
+
+Kada želite proveriti dostupnost nekog uređaja na mreži, koristite ping komandu na Cisco uređaju. Na primer:
+R1# ping 192.168.1.2
+Ova komanda šalje ICMP Echo Request pakete ciljanoj IP adresi (u ovom slučaju 192.168.1.2). 
+Kada je odredišni uređaj (npr. drugi ruter ili host) primi ovaj paket, trebao bi odgovoriti sa ICMP Echo Reply.
+
+ICMP Echo Reply:
+Kada ciljni uređaj (u ovom slučaju 192.168.1.2) prima ICMP Echo Request, trebao bi generisati ICMP Echo Reply kao odgovor.
+Na primer, ako je uređaj s IP adresom 192.168.1.2 primio ICMP Echo Request od 192.168.1.1, odgovorio bi sa ICMP Echo Reply porukom.
+
+Ako ruter prima ICMP Echo Request na interfejsu A i odlučuje da šalje Echo Reply prema izvoru preko interfejsa B, 
+onda će interfejs B biti nazivani NAJUDALJENIJI INTERFEJS u ovom kontekstu.
+----------------------------------
+
+TELNET
+Kada koristite Telnet komandu da biste se povezali sa udaljenim računarom, uspostavlja se jedna TCP sesija koja se održava tokom trajanja sesije komunikacije. 
+Dakle, tokom jedne Telnet sesije, uspostavlja se samo jedna TCP veza.
+
+
+------------------------------------------------------------------------------------------------
+ODGOVORI NA PITANJA SA SVIH ROKOVA 2021-2022
+
+
+MULTICAST, SUMARNE ADRESE(jedinstvena adresa koja predstavlja opseg više specifičnih adresa 
+Primjer 192.168.0.0/16 obuhvata sve adrese u rasponu od 192.168.0.0 do 192.168.255.25) i klase ABC
+------------------------------------------------------------------------------------------------
+Koliko ima: a} multicast MAC adresa, b) multicast 1Pv4 adresa, c) muticast IPv6 adresa (FFOO:/8)?
+
+01:00:5E:00:00:00 - 01:00:5E:7F:FF:FF
+Multicast MAC adresa:
+U drugom dijelu MAC adrese za multicast, koji čini 23 bita (pošto se prvi bit često koristi kao "I/G bit"),
+imamo 2^23 razlicitih mogucnosti. Dakle, broj multicast MAC adresa je 2^23 što iznosi 
+
+Multicast IPv4 adresa:
+U IPv4 rasponu za multicast (224.0.0.0 - 239.255.255.255), imamo ukupno 2^28 mogućih adresa.
+Dakle, broj multicast IPv4 adresa je 2^28 što iznosi 
+
+Multicast IPv6 adresa (FF00::/8):
+U IPv6 rasponu za multicast (od FF00:: do FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF), imamo 2^120 mogućih adresa.
+Dakle, broj multicast IPv6 adresa u rasponu FF00::/8 je 2^120
+
+
+Navesti multicast IP adrese kojima odgovara multicast MAC adresa 01-00-5E-00-00-02 
+-uzmemo zadnja 3 bajta: 00-00-02 _0000000 00000000 00000010(_ jer bit moze biti promjenjiv) i dodamo 1110 0000 na pocetak
+-i dodajemo 1, imacemo 32 razlicite adrese
+1110 0000 (0)0000000 00000000 00000010 = 224.0.0.2
+1110 0001 (0)0000000 00000000 00000010 = 225.0.0.2
+1110 0010 (0)0000000 00000000 00000010 = 226.0.0.2
+1110 0011 (0)0000000 00000000 00000010 = 227.0.0.2
+1110 0100 (0)0000000 00000000 00000010 = 228.0.0.2
+...
+1110 1111 (0)0000000 00000000 00000010 = 239.0.0.2
+sad je 1 u zagradi 
+1110 0000 (1)0000000 00000000 00000010 = 224.128.0.2
+1110 0001 (1)0000000 00000000 00000010 = 225.128.0.2
+...
+1110 1111 (1)0000000 00000000 00000010 = 239.128.0.2
+
+
+-Multicast IP adresi 224.0.0.14 odgovara samo jedna multicast MAC adresa, i to 01-00-5E-00-00-0D ->NETACNO
+tačna odgovarajuća multicast MAC adresa za IP adresu 224.0.0.14 je 01-00-5E-00-00-0E.
+
+-IPv4 adresa iz A klase ima onoliko puta vise od IPv4 adresa iz B klase koliko ima puta vise IPv4 adresa iz C klase u odnosu na broj eksperimentalnih IPv4 adresa.
+Klasa A raspon adresa: 0.0.0.0 do 127.255.255.255   2^31 
+Klasa B raspon adresa: 128.0.0.0 do 191.255.255.255 2^30 2^30 -> 2 puta više iz klase A
+Klasa C raspon adresa: 192.0.0.0 do 223.255.255.25  2^29 
+                   Ipv4 eksperimentalnih (klase E): 2^28 -> 2 puta više klase C -> TACNO
+
+D KLASA 224.0.0.0 to 239.255.255.255
+
+- Navesti sumarnu IPv4 adresu za svaku od klasa A, B i C. 
+Klasa A: Sumarna adresa je 0.0.0.0/1
+Klasa B: Sumarna adresa je 128.0.0.0/2
+Klasa C: Sumarna adresa je 192.0.0.0/3
+
+-Ako je poznato da globalne unicast IPv6 adrese imaju prvu heksadecimalnu cifru 2 ili 3, napisati kako izgleda sumarni oblik za ove adrese
+Za globalne unicast IPv6 adrese, prva heksadecimalna cifra može biti u rasponu od 2 do 7. Dakle, sumarni oblik za globalne unicast IPv6 adrese 
+koje počinju sa 2, 3, 4, 5, 6 ili 7 u prvom heksadecimalnom polju može se zapisati kao 2000::/3. Ovaj sumarni oblik obuhvata sve ove adrese.
+
+
+-Izracunati koliko otprilike u procentima ima privatnih IPv4 adresa u odnosu na ukupan broj Ipv4 adresa. Odgovor navesti u obliku razlomka
+Klasa A privatne adrese: 10.0.0.0 do 10.255.255.255    ima 256^3 adresa
+Klasa B privatne adrese: 172.16.0.0 do 172.31.255.255  ima  (256^2*16) adresa
+Klasa C privatne adrese: 192.168.0.0 do 192.168.255.255 ima 256^2 adresa
+Ukupan broj IPv4 adresa uključuje sve adrese u opsegu od 0.0.0.0 do 255.255.255.255.
+
+(256^3 + 256^2*16 + 256^2) / 256^4 * 100%
+
+-Izracunati koliko ima privatnih IPv4 adresa u odnosu na ukupan broj u svakoj od klasa A, B i C. Odgovor navesti u obliku razlomka
+klasa A: 2^24/2^31
+klasa B: 2^20/2^30
+klasa C: 2^16/2^29
+------------------------------------------------------------------------------------------------
+
+
+random pitanja
+------------------------------------------------------------------------------------------------
+-Izracunati kolika je velicina prvog paketa kojeg posalju racunari u nekom LAN-u prilikom three-way handshake-a. 
+(40B - 120B jer je min veličina IP i TCP PDU-ova 20B, a maksimalna 60B.)
+
+-Ako host ima adresu 192.168.20.1, u cemu je razlika ako se na njemu otkuca ping 127.0.0.1 i ping 192.168.20.1? 
+(ping loopback adrese će proći ukoliko nismo povezani na mrežu, dok ping neće proći(moramo biti povezani u mrežu),
+Ping 127.0.0.1:Proverava lokalnu mrežnu funkcionalnost uređaja. Ping 192.168.20.1 proverava da li postoji uređaj sa zadatom IP adresom)
+
+-Navesti kako izgledaju socketi koji komuniciraju prilikom slanja DHCP DIScoVER poruke. (3) 
+----------
+Prilikom slanja DHCP DISCOVER poruke, klijentski uređaj želi dobiti konfiguracijske informacije od DHCP servera
+Klijentski socket:
+IP adresa klijenta: 0.0.0.0 (nula jer uređaj još nema dodeljenu IP adresu)
+UDP port klijenta: 68 (standardni DHCP klijentski port)
+
+Server socket:
+IP adresa DHCP servera: 255.255.255.255 (adresa za broadcast kako bi poruka stigla do svih DHCP servera u mreži)
+UDP port DHCP servera: 67 (standardni DHCP serverski port)
+----------
+
+
+-Kod kojeg tipa kablova se susrece Manchester kodovanje? Predstaviti kako bi se kodovala sekvenca 0001110101
+kod koaksijalnih kablova i bakarnih kablova. SLIKA JE U SKRINOVANIM SLIKAMA
+
+-Razloziti akronime: TCP, DNS, ICMP, IMAP, CATV, RI4S, MAC, CSMA, RIP, 
+TCP: Transmission Control Protocol
+DNS: Domain Name System
+ICMP: Internet Control Message Protocol
+IMAP: Internet Message Access Protocol
+CATV: Community Antenna Television
+RI4S: Runway Identification for Synchronization
+MAC: Media Access Control
+CSMA: Carrier Sense Multiple Access
+RIP: Routing Information Protocol
+------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+TACNO NETACNO
+------------------------------------------------------------------------------------------------
+
+
+-Kolicina kontrolnih informacija u jednom DNS paketu moze da bude izmedju 28B i 120B -> TACNO
+Min 28B, maks 120B
+Ako koristi UDP -> 14 + 20 + 8 + 28 + 4 = 74B > 64B (Min. za frejm) 
+Ako koristi TCP -> 14 + 60 + 60 + 120 + 4 = 238B < 1518B (Maks. za frejm) 
+
+-U prvom paketu kojim se uspostavljava UDP veza polje Packet Length moze biti postavljeno na 1Ch ->TACNO
+Polje "Packet Length" u zaglavlju UDP označava ukupnu dužinu UDP paketa, uključujući zaglavlje i podatke. 
+Vrednost ovog polja je 16-bitna celobrojna vrednost koja može da zauzme vrednosti od 0 do 65535 bajta. 
+Ako je polje "Packet Length" postavljeno na 1Ch, to znači da je ukupna dužina UDP paketa 28 bajta.
+
+-U prvom paketu kojim se uspostavljava TCP veza polje Packet Length moze biti postavljeno na 28h->TACNO
+"28h" predstavlja decimalnu vrijednost 40, TCP + IP = 40
+
+-Ukoliko TCP segment bude izgubljen na nekom od rutera na putanji, njega ce ponovo poslati ruter prije njega
+nakon sto mu istekne postavljeni timer.->NETACNO
+poslace ga host ponovo, a ne ruter ispred hosta
+
+
+-Maksimalna velicina TCP zaglavlja je 64B -> NETACNO
+Maksimalna veličina TCP zaglavlja iznosi 60 bajta, a dodatno može biti prošireno opcionim zaglavljima (options) 
+koja zauzimaju dodatni prostor od najviše 40 bajta, čime ukupna veličina TCP zaglavlja može biti najviše 60 + 40 = 100 bajta
+
+-Rezultat enkapsulacije na Data Link sloju mora da sadrzi MAC adrese. ->NETACNO
+nije tačna uopšteno, jer ne važi za sve protokole na Data Link sloju. Protokoli kao HDLC, PPP ili Frame Relay ne koriste MAC adrese
+
+-Multicast i eksperimentalnih IPv4 adresa ima isto kao i adresa iz nekadasnje C klase. ->TACNO
+Multicast(224.0.0.0 do 239.255.255.255.) 2^28
+Ipv4 eksperimentalnih (240.0.0.0 do 255.255.255.255) 2^28
+nekadasnje C klase. (192.0.0.0 do 223.255.255.255) 2^29			2^29 = 2 * 2^28
+
+-IPv4 adresa 172.168.255.126/26 mo~e na Internet samo ako je konfigurisan NAT na ruteru.-TACNO
+
+
+-MTU za IP paket u Ethernet frejmu je 1518 B -> NETACNO
+MTU za IP paket je 1500, a ukupna velicina frejma je 1518(zaglavlje + fcs)
+
+-HTTP se koristi za IPv4 pakete, a HTTPS za IPv6 pakete. ->TACNO
+Nije rečeno SAMO za IPv4 ili IPv6. HTTP i HTTPS se mogu koristiti kako za IPv4 tako i za IPv6 sa istim nivoom funkcionalnosti
+
+-lako ima manji broj polja, IPv6 zaglavlje je vece od IPv4 zaglavlja->NETACNO
+Netačno, ne uvijek, IPv6 ima fiksno zaglavlje dužine 40B, dok IPv4 može biti dužine 20B-60B
+
+-Maksimalna velicina IP zaglavlja je 64kB-1B. ->TACNO
+64kb=65536 B, velicina je 16bitova sve 1. Pa se oduzme 1B
+
+-ARP poruka nema IP zaglavlje -> TACNO
+ARP poruka obično sadrži informacije o IP adresi traženog uređaja i odgovarajućoj fizičkoj (MAC) adres
+
+- Ako je poznato da ima preko 1000 OUI prefiksa, Cisco moze da napravi jedinstvenu mreznu karticu za svaku jedinstvenu IPv4 adresu.->TACNO
+Ukupan broj IPv4 adresa je 2^32.
+OUI prefiks druga 3 bajta = 2^24 * 1000(priblizno 2^10) >= 2^32   
+
+-Racunanje CRC vrijednosti je brze od racunanja Checksum vrijednosti u IP zaglavlju -> ZAVISI
+jer nekac CRC izracuna brze od Checksum, i obrnuto.  AT95:F(CRC valjda koristi kompleksnije proračune/algoritme)
+
+-Ako IP adresa pocinje binarnom kombinacijom 111, onda je to eksperimentalna adresa->NETACNO
+moze biti i multicast
+Eksperimentalne adrese 240.0.0.0 do 255.255.255.255. 1110 0000.0.0.0
+
+-Ako IP adresa poinje binarnom kombinacijom 110, onda je to multicast adresa. ->NETACNO
+Dakle, pravilno je reći da ako IP adresa počinje s binarnom kombinacijom "1110", tada je vjerojatno multicast adresa.
+
+-Wi-Fi mreze ne koriste iste adrese za fizicko adresiranje kao i Ethernet.->NETACNO
+Wi-Fi mreže i Ethernet koriste isti model adresiranja na drugom sloju mrežnog modela, tj. DATA LINK sloju.
+Ovaj sloj odgovoran je za fizičko adresiranje, a adrese koje koristi nazivaju se MAC
+
+-802.11 standard koristi protokol CSMA/CD. ->NETACNO
+802.11 standard se koristi za bežične lokalne mreže (Wi-Fi), ne koristi protokol CSMA/CD. KORISTI CSMA/CA
+CSMA/CD je protokol koji se koristi u žičanim mrežama, kao što su Ethernet mreže na bazama bakra.
+
+-Svic na jednom svom portu moze da nauci samo jednu MAC adresu ->NETACNO
+Switchevi mogu naučiti i povezati više MAC adresa s različitim portovima. 
+Svaki switch ima MAC tablicu koja mapira MAC adrese na odgovarajuće portove kako bi efikasno preusmjeravao promet u mrež
+
+------------------------------------------------------------------------------------------------
+
+Odredi tacna i netacna tvrdjenja i objasni
+Mreža 10.10.10.8 je udaljena 120 hopova odrutera.
+IP adresa 10.10.10.6 je dodijeljena interfejsu S0/1. 
+IP adresa 10.10.10.8 je dodijeljena interfejsu S0/1. 
+Ruta koristi podrazumijevanu metriku.
+Ruta može da ima masku 255.255.255.240.
+
+R 10.10.10.8 [120/2] via 10.10.10.6, 00:00:25, S0/1
+
+--rutiranje kad budem radio
+
+
+
+-﻿Host sa MAC adresom aa-aa-aa-aa-aa-aa treba da primi adresu od DHCP servera na istoj mreži sa MAC adresom bb-bb-bb-bb-bb-bb i
+-IP adresom 10.10.10.1. Kako izgledaju socketi koji komuniciraju u drugoj poruci (od četiri) međusobne komunikacije? (3)
+--------------------
+DHCP (Dynamic Host Configuration Protocol) koristi UDP (User Datagram Protocol) za komunikaciju između klijenta (hosta) i DHCP servera. 
+Komunikacija između klijenta i servera odvija se putem DHCP poruka koje se razmjenjuju putem određenih UDP portova. 
+Tipično se koriste UDP portovi 67 (za DHCP server) i 68 (za DHCP klijenta).
+
+Ako host sa MAC adresom aa-aa-aa-aa-aa-aa treba primiti adresu od DHCP servera sa MAC adresom bb-bb-bb-bb-bb-bb i IP adresom 10.10.10.1, 
+komunikacija bi izgledala otprilike ovako:
+
+DHCP Discover poruka od klijenta (aa-aa-aa-aa-aa-aa) prema DHCP serveru (bb-bb-bb-bb-bb-bb) na UDP portu 68.
+DHCP Offer poruka od DHCP servera prema klijentu na UDP portu 67. U ovoj poruci DHCP server nudi IP adresu (10.10.10.1) klijentu.
+DHCP Request poruka od klijenta prema DHCP serveru na UDP portu 68. Klijent potvrđuje primanje IP adrese.
+DHCP Acknowledgment poruka od DHCP servera prema klijentu na UDP portu 67. DHCP server potvrđuje dodjelu IP adrese klijentu.
+
+Ovaj postupak se naziva DHCP četverosmjerna rukovanja. Dakle, socketi koji komuniciraju u drugoj poruci bile bi:
+Izlazni socket klijenta (hosta): aa-aa-aa-aa-aa-aa:68
+Ulazni socket DHCP servera: 0.0.0.0:67 ili bb-bb-bb-bb-bb-bb:67
+Ovdje 0.0.0.0 na DHCP serveru označava da je server spreman odgovoriti na bilo koju dolaznu poruku na portu 67.
+--------------------
+
+-Koje od sljedecih adresa mogu da se dodijele hostovima na Internetu? Obrazloziti sve odgovore. 
+192.169.20.1 255.255.244.0 --- Ne, nevalidna maska
+11.11.11.255 255.255.252.0 --- Ne, broadcast adresa
+223.253.223.253 255.255.255.0 -Da jer je unutar opsega javnih IP adresa (223.0.0.0 - 223.255.255.255) i mreža s maskom 255.255.255.0.
+169.255.0.2 255.255.254.0 --- Ne, adrese u opsegu 16		 često koriste za APIPA (Automatic Private IP Addressing)	
+172.14.256.13 255.255.255.252 -Ne, 256 nije u rasponu 0-255
+1.0.0.143 255.255.255.240 --- Ne, broadcast adresa. Mreza 10.0.0.128/28 ab adresa je upravo 1.0.0.143
+
+-Šta je posljedica ako DHCP server nije operativan u mreži? Objasniti tačnu opciju. 
+Hostovima će biti dodijeljena adresa 0.0.0.0. 
+Hostovima će biti dodijeljena adresa 127.0.0.1. 
+Hostovima će biti dodijeljena adresa iz opsega 10.0.0.0/8.
+Hostovima će biti dodijeljena adresa iz opsega 169.254.0.0/16. --TACNA OPCIJA
+
+Ako DHCP server nije operativan u mreži, hostovi će pokušati dodijeliti sebi IP adrese pomoću mehanizma poznatog kao Automatic Private IP Addressing (APIPA). 
+Ova opcija odgovara opsegu adresa 169.254.0.0/16.
+------------------------------------------------------------------------------------------------
+
+
+
+KABLOVI
+------------------------------------------------------------------------------------------------
+
+6. Samo jedno navedeno tvrđenje za prikazani 100BaseFX kabl je tačno. Otkriti koje i objasniti zašto ostala nisu. (4)
+I Brzina koja se može ostvariti preko ovog kabla odgovara brzinama u Ethernet mrežama.
+II Preko ovog kabla ostvaruje se full duplex prenos. ->TACNO
+III Predstavljeni kabl ima ST konektor.
+IV Kategorija u koju se predstavljeni kabl rangira je minimalno Cat5e. 
+
+Objašnjenje:
+I. Brzina koja se može ostvariti preko ovog kabla ne odgovara brzinama u Ethernet mrežama. 
+100BaseFX podržava brzinu od 100 Mbps, što je uobičajeno za Fast Ethernet,ali ne odgovara gigabitnim brzinama koje su standardne za moderni Ethernet.
+III. Predstavljeni kabl ima SC konektor, a ne ST kako je navedeno u tvrđenju.
+IV 100basefx je opticki kabl, T oznacava twisted pair a f je fiber
+
+Dakle, jedino tačno tvrđenje je II. Nije samo napisano da koristi full duplex.
+Moze korristiti i half(100Mbps) full(200Mpbs)
+
+-100Base-TX mora da bude bar kategorije 5e->NETACNO
+100Base-TX (Fast Ethernet) zahtijeva minimalnu kategoriju kabela Cat5(10/100Mbps). 
+
+
+
+		Tip kabla		Kategorija	Duplex		Max. distanca
+10Base5		Coaxial   		Thicknet 	half		500m
+100Base-FX	Optički			-   half(100Mbps),full(200Mbps)	400m(half)+2km(full) 	Da li treba da navedemo oba?
+1000BaseT	UTP		  	Cat5e		full		100m
+
+
+
+Kabl 		Naziv interfejsa	Maks. podržana dužina segmenta		Tip kodovanja		Ukupan broj parica	Broj parica koje se koriste za primanje		UTP Kategorija	
+10Base-T 	Ethernet		100m					Manchester			4 			1						Cat3/Cat5
+100Base-TX 	FastEthernet		100m 					4B/5B				4 			2 						Cat5
+1000Base-T 	GigabitEthernet		100m 					Linijsko(4D-Pam5) 		4			4						Cat5e
+
+
+
+		Tip kabla	Vrsta/Kategorija	Duplex	Konektor     Maks. distanca		
+10Base2		Koaksijalni	Thinnet			half	BNC		185m
+10Base5		Koaksijalni	Thicknet		half	AUI DB-15	500m
+10BaseT		UTP		Cat3/Cat5		half	RJ45		100m
+
+
+
+------------------------------------------------------------------------------------------------
+
+
