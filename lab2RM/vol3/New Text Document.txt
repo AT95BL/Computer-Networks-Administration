@@ -1,0 +1,23 @@
+Samo pogledaš video...zapišeš sebi nešto ako te zanima..
+
+Meni je novitet to da ruter, pored toga što razdvaja mreže, 
+rješava i kolizije..
+
+Da, kod **Switch-a** imamo onoliko **kolizionih domena** koliko imamo portova. Svaki port na Switch-u predstavlja zasebnu kolizionu domenu. To je zato što Switch uređaj koristi **Layer 2** (data link layer) tehnologiju koja omogućava svakom portu da funkcionira kao zasebna koliziona domena, sprečavajući kolizije između uređaja povezanih na različite portove. Na taj način, uređaji povezani na različite portove Switch-a mogu komunicirati istovremeno bez ometanja.
+
+### Kod Switch-a:
+- **Svaki port** je **zasebna koliziona domena**.
+- Na primjer, ako Switch ima 24 porta, imaćeš 24 kolizione domene.
+
+### Kod **HUB-a** je situacija drugačija:
+- Hub je uređaj koji radi na **Layer 1** (physical layer) i ne upravlja prometom na isti način kao Switch.
+- **Kod HUB-a, svi portovi pripadaju istoj kolizionoj domeni**. To znači da svi uređaji povezani na Hub dijele istu kolizionu domenu. Kada jedan uređaj šalje podatke, svi drugi uređaji na mreži moraju slušati, što povećava šansu za kolizije.
+  
+Dakle, kod Hub-a:
+- **Svi portovi** čine **jednu jedinu kolizionu domenu**, bez obzira na broj portova.
+
+### Zaključak:
+- Kod **Switch-a**, imaš onoliko kolizionih domena koliko imaš portova.
+- Kod **Hub-a**, svi portovi dijele **jednu kolizionu domenu**.
+
+Zato su Switch uređaji mnogo efikasniji u sprečavanju kolizija i poboljšavanju mrežnih performansi u poređenju s Hub-ovima.
