@@ -1,0 +1,41 @@
+1.
+Samo povezivanje na uređaj zahtijeva domišljenost.
+Direktan klik na bilo koji od poneđenih Switch uređaja rezultira porukom o zabrani pristupa.
+Stim u vezi, potrebno je prvi računar Console kablom povezati na Class-A Switch uređaj.
+Isto tako, drugi računar preko Console kabla povezati na Class-B Switch uređaj.
+
+2.
+Nakon povezivanja, idemo podesiti Class-A Switch uređaj.
+Klikom na Student-1, zatim Desktop opcija i tu selektujemo Terminal.
+
+3.
+Slijede komande:
+enable 
+config t
+hostname Class-A
+line console 0
+password xAw6k
+login
+enable secret 6EBUp
+service password-encryption
+banner motd "ETF UNIBL"
+line 0 vty
+password xAw6k				//	jer u tekstu zadatka piše da je to šifra za SVE LINE PASSWORDe!!!
+login
+exit
+exit( vrati se na Class-A# mode!!!)
+copy running-config startup-config
+config t
+interface vlan1
+ip address 10.10.10.100 255.255.255.0
+no shutdown
+exit
+copy running-config startup-config
+
+4.
+Pristupiti drugom računaru, povezati se na drugi Switch i ponoviti isti taj redoslijed komandi!
+
+5.
+Za podešavanje IP address-a računara..samo klik na računar, zatim Desktop i IP Configuration menu
+te popuniti IPv4 i mask polja u skladu sa onim iz teksta zadatka.
+
