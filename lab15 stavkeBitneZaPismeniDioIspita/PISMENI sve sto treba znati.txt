@@ -4,25 +4,31 @@ OSI = Open Systems Interconnection
 DHCP = Dynamic Host Configuration Protocol
 TCP = Transmission Control Protocol
 UDP = User Datagram Protocol
+IP = Internet Protocol --može da bude IPv4 ili IPv6
+PDU = Protocol Data Unit
 
+--------------------------------------------------------------------------------------------------------------------------------------------
 RUTERI
 ---- SERIJSKI LINK NEMA MAC ADRESA(Eth se ne koristi na serijskim linkovima)
-Limited broadcast Adresa ima vrednost 255.255.255.255. Ova adresa se koristi kako bi se poslala poruka svim uređajima unutar iste mreže. Ne ide van mreze
-
-MAC TABELA SWITCHA
+Limited broadcast Adresa ima vrednost 255.255.255.255. 
+Ova adresa se koristi kako bi se poslala poruka svim uređajima unutar iste mreže. 
+Ne ide van mreze!
 --------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+MAC TABELA SWITCHA
 Kada switch (svic) prima frejm, SVIC JE NA L2
 
 Learning (Učenje): https://www.youtube.com/watch?v=cah-hNfWzJs&t=3s
 Ako izvorna MAC adresa u frejmu već postoji u MAC tabeli switcha, switch ažurira vreme poslednjeg viđenja te adrese u tabeli.
 Ako izvorna MAC adresa nije prisutna u tabeli, switch je "uči" dodajući je u tabelu zajedno sa informacijom o portu na kojem je primio frejm.
 Filtriranje i prosljedjivanje:
-Ako se nalazi u tabeli samo njoj prosljedjuje frejm, ako ne onda svima u mrezi osim porta koji je poslao
+Ako se odredišna MAC adresa nalazi u tabeli samo njoj prosljedjuje frejm, ako ne onda svima u mrezi osim porta koji je poslao!
+--------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
-
-----------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------
 Slanje poruke hosta prema serveru:
 L2(MAC adrese) SRC MAC(host) DEST MAC(gateway)
 L3(IP adrese) SRC IP(host) DEST IP(Server)       
@@ -30,6 +36,7 @@ L3(IP adrese) SRC IP(host) DEST IP(Server)
 Uspostavljanje veze izmedju hosta i DNS servera:
 Min velicina Eth frejma:14(zaglavlje) + 4(trailer) + 20(IP zaglavlje) + 20(TCP zaglavlje) + (padding - 6) = 64[B]
 Max je 14+4 +60+60 = 138[B](nema korisnih podataka)
+-------------------------------------------------------------------------------------------------------------------
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -49,8 +56,7 @@ ARP odgovor sadrži traženu MAC adresu.
 Uređaj koji je prvobitno poslao ARP zahtev prima ARP odgovor i ažurira svoj ARP keš sa dobivenom MAC adresom.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
+-------------------------------------------------------------------------------------------------------------------------------------
 DHCP
 https://www.youtube.com/watch?v=e6-TaH5bkjo
 
@@ -74,20 +80,23 @@ DHCP Acknowledgment:
 DHCP server koji je primio DHCP Request poruku potvrđuje zahtev DHCP Acknowledgment porukom.
 Ova poruka sadrži konačne informacije o dodeljenoj IP adresi i drugim konfiguracionim parametrima.
 Kada DHCP klijent primi DHCP Acknowledgment, konfiguriše svoj mrežni interfejs sa dobijenom IP adresom i završava inicijalizaciju.
+-------------------------------------------------------------------------------------------------------------------------------------
 
 
-
+-------------------------------------------------------------------------------------------------------------------------------------
 ENKAPSULACIJA-objedinjavanje kontrolnih i korisnih info na svakom sloju protokol steka
 PDU-rezultat enkapsulacije na nekom sloju
 SKRIVANJE PODATAKA-proces u kojem su osjetljivi podaci sakriveni, i oni su dostupni samo korisniku koji je pokusao da im zametne trag
-------------------------------------------------------------------------------------------------
-VAZNOOOOO
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+VAžNOOOOO
 Koliko polja u zaglavljima TCP segmenta, UDP datagrama, IP paketa i Ethernet frejma ruter mijenja
 prilikom prosljedjivanja toka podataka kojeg primi?
 
 Ethernet frejm - sva polja
 IP zaglavlje - mijenja TTL i Header Checksum
-TCP/UDP zaglavlje - ne mijenja nista, jer su na transportnom sloju, a ruter je na mreznom
+TCP/UDP zaglavlje - ne mijenja nista, jer su na transportnom sloju, a ruter je na mreznom!!
 Međutim, ako ruter vrši Network Address Translation (NAT), što je često slučaj, onda će promeniti 
 izvornu i odredišnu IP adresu u zaglavlju i, u nekim slučajevima, i portove u polju TCP/UDP zaglavlja.
 
@@ -165,21 +174,28 @@ Port 161/162: SNMP (Simple Network Management Protocol)
 (**Protokol (protocol)** i **port** su ključni pojmovi u mrežnoj komunikaciji, koji omogućavaju prenos podataka između uređaja.
 
 ### **Protokol (protocol)**:
-Protokol je set pravila koji definiše kako će se podaci prenositi između dva uređaja na mreži. On određuje kako se podaci formiraju, šalju, primaju i obrađuju. Postoje različiti protokoli za različite tipove komunikacije.
+Protokol je set pravila koji definiše kako će se podaci prenositi između dva uređaja na mreži. 
+On određuje kako se podaci formiraju, šalju, primaju i obrađuju. 
+Postoje različiti protokoli za različite tipove komunikacije.
 
-- **TCP (Transmission Control Protocol)**: Obezbeđuje pouzdanu komunikaciju, tako što uspostavlja vezu pre prenosa podataka, potvrđuje prijem paketa, i brine o ponovnom slanju u slučaju grešaka.
+- **TCP (Transmission Control Protocol)**: 
+Obezbeđuje pouzdanu komunikaciju, tako što uspostavlja vezu pre prenosa podataka, potvrđuje prijem paketa, i brine o ponovnom slanju u slučaju grešaka.
   
-- **UDP (User Datagram Protocol)**: Omogućava brži prenos podataka bez uspostavljanja veze i bez garancije isporuke, što znači da podaci mogu biti izgubljeni ili primljeni van reda, ali je zato manji overhead.
+- **UDP (User Datagram Protocol)**: 
+Omogućava brži prenos podataka bez uspostavljanja veze i bez garancije isporuke, što znači da podaci mogu biti izgubljeni ili primljeni van reda, ali je zato manji overhead.
 
 ### **Port**:
-Port je brojčana oznaka koja identifikuje specifičnu aplikaciju ili uslugu na jednom računaru. Portovi omogućavaju istovremeni prenos podataka različitim aplikacijama na istom uređaju. Na primer, jedan server može istovremeno da pruža različite usluge kao što su web (HTTP) i e-mail (SMTP), a različiti portovi služe za razlikovanje tih usluga.
+Port je brojčana oznaka koja identifikuje specifičnu aplikaciju ili uslugu na jednom računaru. 
+Portovi omogućavaju istovremeni prenos podataka različitim aplikacijama na istom uređaju. 
+Na primer, jedan server može istovremeno da pruža različite usluge kao što su web (HTTP) i e-mail (SMTP), a različiti portovi služe za razlikovanje tih usluga.
 
 - **Port 80 (TCP)**: Koristi se za HTTP, web stranice bez enkripcije.
 - **Port 443 (TCP)**: Koristi se za HTTPS, web stranice sa enkripcijom.
 - **Port 53 (TCP/UDP)**: DNS, koji služi za prevođenje domena u IP adrese.
 
 ### Primer upotrebe:
-Kada upišeš URL u pretraživač, koristiš **HTTP** ili **HTTPS** protokol. Web server sluša na **portu 80** (za HTTP) ili **portu 443** (za HTTPS), čime omogućava da ti isporuči odgovarajuće podatke preko mreže.
+Kada upišeš URL u pretraživač, koristiš **HTTP** ili **HTTPS** protokol. 
+Web server sluša na **portu 80** (za HTTP) ili **portu 443** (za HTTPS), čime omogućava da ti isporuči odgovarajuće podatke preko mreže.
 
 ### Ukratko:
 - **Protokol** definiše pravila komunikacije.
@@ -290,7 +306,7 @@ ukoliko postoji na putanji još rutera, odredišni host neće ni primiti paket, 
 -------------------------
 
 IPv4
------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 IPv4 zaglavlje ima fiksnu veličinu od 20 bajtova (160 bitova). Ovo je standardna veličina za IPv4 pakete i uključuje različite informacije potrebne za rutiranje i
 isporuku podataka na odredište. Slijede polja koja čine IPv4 zaglavlje:
 
@@ -306,7 +322,7 @@ Time to Live (TTL): 8 bita - Broj ruterskih skokova (hop count) koji paket može
 Protocol: 8 bita - Označava vrstu transportnog protokola (npr. TCP, UDP).
 Header Checksum: 16 bita - Provjera greške zaglavlja.
 Izvor (Source) i Odredište (Destination) IP adrese: Po 32 bita - IP adrese izvora i odredišta.
------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
  
 IPv6
 -----------------------------------------------------------------------------------------------------------------------------
